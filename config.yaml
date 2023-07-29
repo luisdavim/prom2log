@@ -1,0 +1,5 @@
+queries:
+  SLO:
+    interval: 30s
+    server: https://prom.example.com
+    promQL: '(sum by(name) (rate(check_status_total{status="success", type=~"http",}[25h])) * 100) / ignoring(status) group_left() sum by(name) (rate(check_status_total{type=~"http", }[24h]))'
