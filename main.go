@@ -65,6 +65,16 @@ func prettyQuery(name string, query Query, f formatOps) error {
 		f.NoColour = true
 		f.NoPrettyJSON = true
 	}
+
+	if !f.NoColour {
+		o, _ := os.Stdout.Stat()
+		if (o.Mode() & os.ModeCharDevice) != os.ModeCharDevice {
+			// output is not a terminal
+			f.NoColour = true
+			f.NoPrettyJSON = true
+		}
+	}
+
 	b, err := query.Get()
 	if err != nil {
 		return err
@@ -77,15 +87,13 @@ func prettyQuery(name string, query Query, f formatOps) error {
 			return err
 		}
 	}
+
 	if f.NoColour {
 		fmt.Print(res)
-	} else {
-		err := quick.Highlight(os.Stdout, res, "json", "terminal", "native")
-		if err != nil {
-			return err
-		}
+		return nil
 	}
-	return nil
+
+	return quick.Highlight(os.Stdout, res, "json", "terminal", "native")
 }
 
 type formatOps struct {
